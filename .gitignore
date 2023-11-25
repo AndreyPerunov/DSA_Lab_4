@@ -1,0 +1,18 @@
+#config files
+.vscode/*
+.vscode
+
+#compiled files
+*.exe
+
+#report and task documents
+*.doc
+*.docx
+
+#other individual tasks
+alfa.txt
+bravo.txt
+charlie.txt
+
+#others
+*.tmp
