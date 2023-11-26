@@ -23,6 +23,11 @@ public:
     root = node;
   }
 
+  Tree(std::string data) {
+    root = nullptr;
+    deserialize(data);
+  }
+
   Node* createNode(int data) {
     Node* newNode = new Node;
     newNode->data = data;
@@ -86,21 +91,8 @@ public:
     node->height = std::max(treeHeight(node->left), treeHeight(node->right)) + 1;
   }
 
-  // Task 1. Traverse: Level order traversal: Visits nodes level-by-level and in left-to-right fashion at the same level.✅
   void print(Node* root) {
-    std::queue<Node*> queue; // FIFO
-    queue.push(root);
-    while (queue.size() > 0) {
-      Node* node = queue.front(); // get first element
-      queue.pop(); // remove first element
-      std::cout << node->data << " ";
-      if (node->left != nullptr) {
-        queue.push(node->left);
-      }
-      if (node->right != nullptr) {
-        queue.push(node->right);
-      }
-    }
+    std::cout << serialize(root) << std::endl;
   }
 
   // Requirements: Implement a tree element search by a given value.✅
@@ -147,9 +139,50 @@ public:
     return x;
   }
 
-  // Task 3. Serialize and Deserialize: a Binary Tree to a String ( convert binary tree to a String )🕐
-  std::string serialize(Node* root);
-  Node* deserialize(std::string data);
+  // Task 3. Serialize and Deserialize: a Binary Tree to a String ( convert binary tree to a String )✅
+  std::string serialize(Node* root) {
+    std::string result = "";
+    // Task 1. Traverse: Level order traversal: Visits nodes level-by-level and in left-to-right fashion at the same level.✅
+    std::queue<Node*> queue; // FIFO
+    queue.push(root);
+    while (queue.size() > 0) {
+      Node* node = queue.front(); // get first element
+      queue.pop(); // remove first element
+      result += std::to_string(node->data) + " ";
+      if (node->left != nullptr) {
+        queue.push(node->left);
+      }
+      if (node->right != nullptr) {
+        queue.push(node->right);
+      }
+    }
+    if (result.length() > 0) {
+      result.pop_back();
+    }
+    return result;
+  };
+  
+  Node* deserialize(std::string data) {
+    std::vector<std::string> nodes;
+    std::string node = "";
+    for (int i = 0; i < data.length(); i++) {
+      if (data[i] == ' ') {
+        nodes.push_back(node);
+        node = "";
+      } else {
+        node += data[i];
+      }
+    }
+    nodes.push_back(node);
+    for (int i = 0; i < nodes.size(); i++) {
+      try {
+        addElement(createNode(std::stoi(nodes[i])));
+      } catch (const std::invalid_argument& e) {
+        std::cout << "Error reading number." << std::endl;
+      }
+    }
+    return Tree::root;
+  }
 };
 
 int main() {
@@ -178,9 +211,30 @@ int main() {
   file.close();
   std::cout << std::endl;
 
+  std::cout << "Tree:" << std::endl;
   tree.print(tree.root);
 
+  std::cout << std::endl;
+
+  std::cout << "Search 5:" << std::endl;
   tree.search(5);
+  std::cout << "Search 91:" << std::endl;
+  tree.search(91);
+  std::cout << "Search 41:" << std::endl;
+  tree.search(41);
+
+  std::cout << std::endl;
+
+  std::cout << "Serialize:" << std::endl;
+  std::string resultOfSerialization = tree.serialize(tree.root);
+  std::cout << resultOfSerialization << std::endl;  
+
+  std::cout << std::endl;
+  
+  Tree tree2;
+  std::cout << "Deserialize:" << std::endl;
+  tree2.deserialize(resultOfSerialization);
+  tree2.print(tree2.root);
 
   return 0;
 }
