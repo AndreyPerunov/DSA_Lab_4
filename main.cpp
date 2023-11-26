@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <queue>
 
 // Requirements: build binary sorted tree
 class Tree {
@@ -69,7 +70,22 @@ public:
   
   void deleteElement(Node* node);
   // Task 1. Traverse: Level order traversal: Visits nodes level-by-level and in left-to-right fashion at the same level.
-  void printTree(Node* root);
+  // Level Order Traversal ✅
+  void printTree(Node* root) {
+    std::queue<Node*> queue; // FIFO
+    queue.push(root);
+    while (queue.size() > 0) {
+      Node* node = queue.front(); // get first element
+      queue.pop(); // remove first element
+      std::cout << node->data << " ";
+      if (node->left != nullptr) {
+        queue.push(node->left);
+      }
+      if (node->right != nullptr) {
+        queue.push(node->right);
+      }
+    }
+  }
   // Requirements: Implement a tree element search by a given value.
   Node* getNode(int data);
   // Task 2. Balance: Double Rotation
