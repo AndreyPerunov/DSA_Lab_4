@@ -4,7 +4,7 @@
 #include <vector>
 #include <queue>
 
-// Requirements: build binary sorted tree
+// Requirements: build binary sorted tree✅
 class Tree {
   struct Node {
     int data;
@@ -32,45 +32,61 @@ public:
     return newNode;
   }
 
-  // Task for all: prevent to add non unique number give error✅
-  void addElement(Node* currentNode, Node* newNode) {
-    if (root == nullptr) {
-      root = newNode;
-      return;
-    }
-    if (newNode->data < currentNode->data) {
-      if (currentNode->left == nullptr) {
-        currentNode->left = newNode;
-      } else {
-        addElement(currentNode->left, newNode);
-      }
-    } else if (newNode->data > currentNode->data) {
-      if (currentNode->right == nullptr) {
-        currentNode->right = newNode;
-      } else {
-        addElement(currentNode->right, newNode);
-      }
-    } else {
-      std::cout << "Error: non unique number" << std::endl;
-    }
-
-    updateHeight(currentNode);
-    // balanceTree(currentNode);
+  // Task for all: void addElement(node)✅
+  void addElement(Node* newNode) {
+    root = insert(root, newNode);
   }
 
-  // ✅
+  Node* insert(Node* currentNode, Node* newNode) {
+    if (currentNode == nullptr) {
+      currentNode = newNode;
+      return currentNode;
+    }
+    if (newNode->data < currentNode->data) {
+      currentNode->left = insert(currentNode->left, newNode);
+    } else if (newNode->data > currentNode->data) {
+      currentNode->right = insert(currentNode->right, newNode);
+    } else {
+      // Task for all: prevent to add non unique number give error✅
+      std::cout << "Error: non unique number" << std::endl;
+      return currentNode;
+    }
+
+    // Update height
+    updateHeight(currentNode);
+
+    // Task 2. Balance: Double Rotation
+    int balance = getBalance(currentNode);
+    if (balance > 1 && newNode->data < currentNode->left->data) {
+      return rightRotate(currentNode);
+    }
+    if (balance < -1 && newNode->data > currentNode->right->data) {
+      return leftRotate(currentNode);
+    }
+    if (balance > 1 && newNode->data > currentNode->left->data) {
+      currentNode->left = leftRotate(currentNode->left);
+      return rightRotate(currentNode);
+    }
+    if (balance < -1 && newNode->data < currentNode->right->data) {
+      currentNode->right = rightRotate(currentNode->right);
+      return leftRotate(currentNode);
+    }
+    return currentNode;
+  }
+
+  // Task for all: void deleteElement(node)
+  void deleteElement(Node* node);
+
+  // Task for all: int treeHeight(root)✅
   int treeHeight(Node* root) {
     return root == nullptr ? -1 : root->height;
   }
 
-  // ✅
   void updateHeight(Node* node) {
     node->height = std::max(treeHeight(node->left), treeHeight(node->right)) + 1;
   }
-  
-  void deleteElement(Node* node);
-  // Task 1. Traverse: Level order traversal: Visits nodes level-by-level and in left-to-right fashion at the same level.
-  // Level Order Traversal ✅
+
+  // Task 1. Traverse: Level order traversal: Visits nodes level-by-level and in left-to-right fashion at the same level.✅
   void printTree(Node* root) {
     std::queue<Node*> queue; // FIFO
     queue.push(root);
@@ -86,25 +102,47 @@ public:
       }
     }
   }
+
   // Requirements: Implement a tree element search by a given value.
   Node* getNode(int data);
-  // Task 2. Balance: Double Rotation
-  void balanceTree(Node* root);
+  
+  // Task 2. Balance: Double Rotation (Left and Right Rotation) ✅
+  int getBalance(Node* node) {
+    return node == nullptr ? 0 : treeHeight(node->left) - treeHeight(node->right);
+  }
+
+  Node* rightRotate(Node* node) {
+    Node* x = node->left;
+    Node* T = x->right;
+    // Perform rotation
+    x->right = node;
+    node->left = T;
+    // Update heights
+    updateHeight(node);
+    updateHeight(x);
+    return x;
+  }
+
+  Node* leftRotate(Node* node) {
+    Node* x = node->right;
+    Node* T = x->left;
+    // Perform rotation
+    x->left = node;
+    node->right = T;
+    // Update heights
+    updateHeight(node);
+    updateHeight(x);
+    return x;
+  }
+
+  // Task 3. Serialize and Deserialize: a Binary Tree to a String ( convert binary tree to a String )
+  std::string serialize(Node* root);
+  Node* deserialize(std::string data);
 };
 
 int main() {
   // Declare Tree  
   Tree tree;
-
-  tree.addElement(tree.root, tree.createNode(20));
-  tree.addElement(tree.root, tree.createNode(10));
-  tree.addElement(tree.root, tree.createNode(40));
-  tree.addElement(tree.root, tree.createNode(30));
-  tree.addElement(tree.root, tree.createNode(50));
-  tree.addElement(tree.root, tree.createNode(21));
-
-  tree.printTree(tree.root);
-  return 0;
 
   // Read Data
   std::ifstream file("delta.txt");
@@ -119,7 +157,7 @@ int main() {
   while (getline(file, line)) {
     try {      
       int number = std::stoi(line);
-      tree.addElement(tree.root, tree.createNode(number));
+      tree.addElement(tree.createNode(number));
     } catch (const std::invalid_argument& e) {
       std::cerr << "Error reading line number." << std::endl;
     }
@@ -128,11 +166,7 @@ int main() {
   file.close();
   std::cout << std::endl;
 
-  // Task 1. Traverse: Level order traversal: Visits nodes level-by-level and in left-to-right fashion at the same level.  
-
-  // Task 2. Balance: Double Rotation
-
-  // Task 3. Serialize and Deserialize: a Binary Tree to a String ( conver binary tree to a String )
+  tree.printTree(tree.root);
 
   return 0;
 }
