@@ -74,7 +74,7 @@ public:
     return currentNode;
   }
 
-  // Task for all: void deleteElement(node)
+  // Task for all: void deleteElement(node)🕐
   void deleteElement(Node* node);
 
   // Task for all: int treeHeight(root)✅
@@ -87,7 +87,7 @@ public:
   }
 
   // Task 1. Traverse: Level order traversal: Visits nodes level-by-level and in left-to-right fashion at the same level.✅
-  void printTree(Node* root) {
+  void print(Node* root) {
     std::queue<Node*> queue; // FIFO
     queue.push(root);
     while (queue.size() > 0) {
@@ -103,8 +103,20 @@ public:
     }
   }
 
-  // Requirements: Implement a tree element search by a given value.
-  Node* getNode(int data);
+  // Requirements: Implement a tree element search by a given value.✅
+  Node* search(int data) {
+    return getNode(root, data);
+  }
+
+  Node* getNode(Node* node, int data) {
+    if (node == nullptr) {
+      return nullptr;
+    }
+    if (node->data == data) {
+      return node;
+    }
+    return (data < node->data) ? getNode(node->left, data) : getNode(node->right, data);
+  }
   
   // Task 2. Balance: Double Rotation (Left and Right Rotation) ✅
   int getBalance(Node* node) {
@@ -135,7 +147,7 @@ public:
     return x;
   }
 
-  // Task 3. Serialize and Deserialize: a Binary Tree to a String ( convert binary tree to a String )
+  // Task 3. Serialize and Deserialize: a Binary Tree to a String ( convert binary tree to a String )🕐
   std::string serialize(Node* root);
   Node* deserialize(std::string data);
 };
@@ -166,7 +178,9 @@ int main() {
   file.close();
   std::cout << std::endl;
 
-  tree.printTree(tree.root);
+  tree.print(tree.root);
+
+  tree.search(5);
 
   return 0;
 }
