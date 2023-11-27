@@ -80,7 +80,7 @@ public:
     return currentNode;
   }
 
-  // Task for all: void deleteElement(node)🕐
+  // Task for all: void deleteElement(node)✅
   void deleteElement(Node* node) {
     root = deleteNode(root, node);
   }
@@ -107,6 +107,10 @@ public:
         root->right = deleteNode(root->right, temp);
       }
     }
+
+    // Update height
+    updateHeight(root);
+
     int balance = getBalance(root);
     if (balance == 2 && getBalance(root->left) >= 0) {
       return rightRotate(root);
