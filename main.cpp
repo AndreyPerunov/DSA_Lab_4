@@ -6,13 +6,14 @@
 
 // Requirements: build binary sorted tree✅
 class Tree {
+public:
   struct Node {
     int data;
     int height;
     Node* left;
     Node* right;
   };
-public:
+
   Node* root;
 
   Tree() {
@@ -80,7 +81,54 @@ public:
   }
 
   // Task for all: void deleteElement(node)🕐
-  void deleteElement(Node* node);
+  void deleteElement(Node* node) {
+    root = deleteNode(root, node);
+  }
+
+  Node* deleteNode(Node* root, Node* node) {
+    if (root == nullptr) {
+      return root;
+    } else if (node->data < root->data) {
+      root->left = deleteNode(root->left, node);
+    } else if (node->data > root->data) {
+      root->right = deleteNode(root->right, node);
+    } else {
+      if (root->left == nullptr) {
+        Node* temp = root->right;
+        delete root;
+        return temp;
+      } else if (root->right == nullptr) {
+        Node* temp = root->left;
+        delete root;
+        return temp;
+      } else {
+        Node* temp = minValueNode(root->right);
+        root->data = temp->data;
+        root->right = deleteNode(root->right, temp);
+      }
+    }
+    int balance = getBalance(root);
+    if (balance == 2 && getBalance(root->left) >= 0) {
+      return rightRotate(root);
+    } else if (balance == 2 && getBalance(root->left) == -1) {
+      root->left = leftRotate(root->left);
+      return rightRotate(root);
+    } else if (balance == -2 && getBalance(root->right) <= 0) {
+      return leftRotate(root);
+    } else if (balance == -2 && getBalance(root->right) == 1) {
+      root->right = rightRotate(root->right);
+      return leftRotate(root);
+    }
+    return root;
+  }
+
+  Node* minValueNode(Node* node) {
+    Node* current = node;
+    while (current->left != nullptr) {
+      current = current->left;
+    }
+    return current;
+  }
 
   // Task for all: int treeHeight(root)✅
   int treeHeight(Node* root) {
@@ -235,6 +283,13 @@ int main() {
   std::cout << "Deserialize:" << std::endl;
   tree2.deserialize(resultOfSerialization);
   tree2.print(tree2.root);
+
+  std::cout << std::endl;
+
+  std::cout << "Delete 5:" << std::endl;
+  Tree::Node* node = tree.search(5);
+  tree.deleteElement(node);
+  tree.print(tree.root);
 
   return 0;
 }
